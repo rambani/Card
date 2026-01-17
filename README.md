@@ -1,17 +1,48 @@
-# Smart Card Rewards Selection System
+# SmartPay - Smart Card Rewards Selection
 
-A digital wallet system that automatically selects the optimal credit card for each transaction based on rewards, offers, and spending patterns.
+**Never use the wrong credit card again.**
+
+SmartPay is a digital wallet companion that tells you which credit card to use for maximum rewards at every purchase.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│   📍 You walk into Chipotle                                     │
+│                                                                 │
+│   ┌───────────────────────────────────────┐                    │
+│   │ 🍽️ CHIPOTLE                           │                    │
+│   │                                       │                    │
+│   │ Use Amex Gold for 4x points           │                    │
+│   │ Earn ~$3.00 on this purchase          │                    │
+│   │                                       │                    │
+│   │ [ ✓ Open Wallet ]                     │                    │
+│   └───────────────────────────────────────┘                    │
+│                                                                 │
+│   One tap → Right card → Maximum rewards                        │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+## How It Works
+
+1. **You arrive** at a store/restaurant
+2. **SmartPay detects** the merchant via location
+3. **You see** which card earns the most rewards
+4. **You confirm** with one tap
+5. **You pay** with the optimal card
+
+That's it. No thinking required.
 
 ## Documentation
 
 | Document | Description |
 |----------|-------------|
-| [README.md](README.md) | Quick start and overview |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and component design |
+| **[docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md)** | **Start here** - Simple explanation of the system |
+| [docs/SMARTPAY_UX.md](docs/SMARTPAY_UX.md) | User experience flows and UI designs |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical architecture and components |
 | [docs/API_GUIDE.md](docs/API_GUIDE.md) | Complete API reference with examples |
-| [docs/DATA_TRANSMISSION.md](docs/DATA_TRANSMISSION.md) | How credit card data flows and MCC codes work |
-| [docs/INTEGRATION_GUIDE.md](docs/INTEGRATION_GUIDE.md) | Integration with mobile apps, browsers, POS systems |
-| [docs/SMARTPAY_UX.md](docs/SMARTPAY_UX.md) | SmartPay user experience and UI flows |
+| [docs/DATA_TRANSMISSION.md](docs/DATA_TRANSMISSION.md) | How credit card data and MCC codes work |
+| [docs/INTEGRATION_GUIDE.md](docs/INTEGRATION_GUIDE.md) | Mobile app, browser, and POS integration |
 
 ## Features
 
@@ -121,6 +152,53 @@ curl http://localhost:3000/api/best-cards-by-category \
   -H "x-user-id: user123"
 ```
 
+### SmartPay (Location-Based)
+
+```bash
+# When user arrives at a location
+curl -X POST http://localhost:3000/api/smartpay/location \
+  -H "Content-Type: application/json" \
+  -H "x-user-id: user123" \
+  -d '{
+    "latitude": 37.7749,
+    "longitude": -122.4194
+  }'
+
+# Quick select via Siri/Widget
+curl -X POST http://localhost:3000/api/smartpay/quick-select \
+  -H "Content-Type: application/json" \
+  -H "x-user-id: user123" \
+  -d '{ "category": "GROCERIES" }'
+```
+
+## Why This Approach?
+
+### The Platform Reality
+
+Apple Pay and Google Pay **don't allow** apps to automatically switch the default card. This is a security decision by Apple/Google - no public API exists.
+
+### Alternatives Considered
+
+| Approach | Status | Why Not |
+|----------|--------|---------|
+| Auto-switch Apple Pay | ❌ | No API available |
+| Curve-style routing | ❌ | Requires banking license, not in US |
+| Intercept payments | ❌ | Not technically possible |
+| **Smart recommendations** | ✅ | **Works today, no regulatory hurdles** |
+
+### Our Solution
+
+Instead of fighting platform limitations, we **tell you the right card** and make confirmation effortless:
+
+- **One tap** for known merchants
+- **Category picker** when uncertain
+- **Voice commands** via Siri shortcuts
+- **Lock screen widget** for quick access
+
+You spend 3 seconds confirming → You never miss rewards again.
+
+See [docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md) for detailed explanation.
+
 ## How It Works
 
 ### Transaction Identification
@@ -179,11 +257,12 @@ src/
 └── index.ts              # Application entry point
 
 docs/
+├── HOW_IT_WORKS.md       # Start here - simple explanation
+├── SMARTPAY_UX.md        # User experience flows
 ├── ARCHITECTURE.md       # System architecture
 ├── API_GUIDE.md          # Complete API reference
 ├── DATA_TRANSMISSION.md  # Credit card data flow
-├── INTEGRATION_GUIDE.md  # Platform integration guides
-└── SMARTPAY_UX.md        # SmartPay user experience
+└── INTEGRATION_GUIDE.md  # Platform integration guides
 ```
 
 ## Security Notes
