@@ -2,6 +2,16 @@
 
 A digital wallet system that automatically selects the optimal credit card for each transaction based on rewards, offers, and spending patterns.
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [README.md](README.md) | Quick start and overview |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System architecture and component design |
+| [docs/API_GUIDE.md](docs/API_GUIDE.md) | Complete API reference with examples |
+| [docs/DATA_TRANSMISSION.md](docs/DATA_TRANSMISSION.md) | How credit card data flows and MCC codes work |
+| [docs/INTEGRATION_GUIDE.md](docs/INTEGRATION_GUIDE.md) | Integration with mobile apps, browsers, POS systems |
+
 ## Features
 
 - **Smart Card Selection**: Automatically recommends the best card for each purchase
@@ -165,7 +175,10 @@ src/
 └── index.ts              # Application entry point
 
 docs/
-└── DATA_TRANSMISSION.md  # How credit card data works
+├── ARCHITECTURE.md       # System architecture
+├── API_GUIDE.md          # Complete API reference
+├── DATA_TRANSMISSION.md  # Credit card data flow
+└── INTEGRATION_GUIDE.md  # Platform integration guides
 ```
 
 ## Security Notes
