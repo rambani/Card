@@ -11,6 +11,8 @@
 import { Router, Request, Response } from 'express';
 import { walletService } from '../services/WalletService';
 import { cardSelectionService } from '../services/CardSelectionService';
+import { smartPayService } from '../services/SmartPayService';
+import { walletSwitcher } from '../services/WalletSwitcher';
 import { TransactionRequest } from '../models/Transaction';
 import { CardInput, CardNetwork, CardType } from '../models/Card';
 import { RewardCategory } from '../models/Reward';
@@ -368,6 +370,159 @@ router.get('/mcc/:code', (req: Request, res: Response) => {
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to lookup MCC' });
+  }
+});
+
+// ============================================
+// SMARTPAY ENDPOINTS (Location-Based Selection)
+// ============================================
+
+/**
+ * POST /api/smartpay/location
+ * Process a location update and get card recommendation
+ *
+ * This is the main endpoint for the SmartPay experience.
+ * Call this when user's location changes significantly.
+ */
+router.post('/smartpay/location', async (req: Request, res: Response) => {
+  try {
+    const userId = req.headers['x-user-id'] as string;
+    if (!userId) {
+      return res.status(401).json({ error: 'User ID required' });
+    }
+
+    const { latitude, longitude, accuracy, estimatedAmount } = req.body;
+
+    const notification = await smartPayService.processLocationUpdate(
+      userId,
+      { latitude, longitude, accuracy: accuracy || 10 },
+      estimatedAmount || 50
+    );
+
+    if (!notification) {
+      return res.json({ detected: false, message: 'No merchant detected nearby' });
+    }
+
+    res.json({
+      detected: true,
+      notification
+    });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/smartpay/confirm
+ * User confirms the recommended card
+ */
+router.post('/smartpay/confirm', async (req: Request, res: Response) => {
+  try {
+    const userId = req.headers['x-user-id'] as string;
+    if (!userId) {
+      return res.status(401).json({ error: 'User ID required' });
+    }
+
+    const { notificationId } = req.body;
+    const result = await smartPayService.confirmSelection(notificationId, userId);
+    res.json(result);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/smartpay/select-category
+ * User selects a category (when confidence is low/medium)
+ */
+router.post('/smartpay/select-category', async (req: Request, res: Response) => {
+  try {
+    const userId = req.headers['x-user-id'] as string;
+    if (!userId) {
+      return res.status(401).json({ error: 'User ID required' });
+    }
+
+    const { notificationId, category, estimatedAmount } = req.body;
+    const notification = await smartPayService.selectCategory(
+      notificationId,
+      userId,
+      category as RewardCategory,
+      estimatedAmount || 50
+    );
+    res.json({ notification });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/smartpay/quick-select
+ * Quick category selection (for Siri shortcuts, widgets, etc.)
+ *
+ * Example: "Hey Siri, I'm buying groceries"
+ * → Calls this endpoint with category: "GROCERIES"
+ */
+router.post('/smartpay/quick-select', async (req: Request, res: Response) => {
+  try {
+    const userId = req.headers['x-user-id'] as string;
+    if (!userId) {
+      return res.status(401).json({ error: 'User ID required' });
+    }
+
+    const { category, estimatedAmount } = req.body;
+    const result = await smartPayService.quickSelect(
+      userId,
+      category as RewardCategory,
+      estimatedAmount || 50
+    );
+    res.json(result);
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+/**
+ * GET /api/smartpay/categories
+ * Get all available categories with best cards
+ * (For building the category picker UI)
+ */
+router.get('/smartpay/categories', async (req: Request, res: Response) => {
+  try {
+    const userId = req.headers['x-user-id'] as string;
+    if (!userId) {
+      return res.status(401).json({ error: 'User ID required' });
+    }
+
+    const categories = await smartPayService.getAllCategoryOptions(userId);
+    res.json({ categories });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
+  }
+});
+
+/**
+ * POST /api/smartpay/switch-wallet
+ * Get instructions for switching wallet default card
+ */
+router.post('/smartpay/switch-wallet', async (req: Request, res: Response) => {
+  try {
+    const { cardId } = req.body;
+    const userAgent = req.headers['user-agent'] as string;
+
+    const card = walletService.getCard(cardId);
+    if (!card) {
+      return res.status(404).json({ error: 'Card not found' });
+    }
+
+    const walletProvider = walletSwitcher.detectWalletProvider(userAgent);
+    const result = await walletSwitcher.switchDefaultCard(card, walletProvider);
+
+    res.json({
+      ...result,
+      cardVisual: walletSwitcher.generateCardVisual(card)
+    });
+  } catch (error: any) {
+    res.status(400).json({ error: error.message });
   }
 });
 

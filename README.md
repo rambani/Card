@@ -11,6 +11,7 @@ A digital wallet system that automatically selects the optimal credit card for e
 | [docs/API_GUIDE.md](docs/API_GUIDE.md) | Complete API reference with examples |
 | [docs/DATA_TRANSMISSION.md](docs/DATA_TRANSMISSION.md) | How credit card data flows and MCC codes work |
 | [docs/INTEGRATION_GUIDE.md](docs/INTEGRATION_GUIDE.md) | Integration with mobile apps, browsers, POS systems |
+| [docs/SMARTPAY_UX.md](docs/SMARTPAY_UX.md) | SmartPay user experience and UI flows |
 
 ## Features
 
@@ -171,14 +172,18 @@ src/
 │   └── Transaction.ts    # Transaction data model
 ├── services/
 │   ├── CardSelectionService.ts  # Selection algorithm
-│   └── WalletService.ts         # Wallet management
+│   ├── WalletService.ts         # Wallet management
+│   ├── SmartPayService.ts       # Location-based selection
+│   ├── LocationService.ts       # Merchant detection
+│   └── WalletSwitcher.ts        # Apple/Google Pay integration
 └── index.ts              # Application entry point
 
 docs/
 ├── ARCHITECTURE.md       # System architecture
 ├── API_GUIDE.md          # Complete API reference
 ├── DATA_TRANSMISSION.md  # Credit card data flow
-└── INTEGRATION_GUIDE.md  # Platform integration guides
+├── INTEGRATION_GUIDE.md  # Platform integration guides
+└── SMARTPAY_UX.md        # SmartPay user experience
 ```
 
 ## Security Notes
