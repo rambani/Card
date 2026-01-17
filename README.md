@@ -38,6 +38,7 @@ That's it. No thinking required.
 | Document | Description |
 |----------|-------------|
 | **[docs/HOW_IT_WORKS.md](docs/HOW_IT_WORKS.md)** | **Start here** - Simple explanation of the system |
+| **[docs/TESTING_GUIDE.md](docs/TESTING_GUIDE.md)** | **Test it** - Step-by-step testing instructions |
 | [docs/SMARTPAY_UX.md](docs/SMARTPAY_UX.md) | User experience flows and UI designs |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Technical architecture and components |
 | [docs/API_GUIDE.md](docs/API_GUIDE.md) | Complete API reference with examples |
@@ -46,12 +47,39 @@ That's it. No thinking required.
 
 ## Features
 
-- **Smart Card Selection**: Automatically recommends the best card for each purchase
-- **MCC-Based Categorization**: Uses Merchant Category Codes to identify transaction types
+- **Simple Card Selection**: Just pick your cards from a list - no card numbers needed
+- **Smart Recommendations**: Automatically recommends the best card for each purchase
+- **No Login Required**: Works immediately, no account setup
+- **Category-Based**: Uses merchant categories to identify transaction types
 - **Reward Calculation**: Calculates effective cash back value for points/miles
-- **Offer Tracking**: Includes active promotions in reward calculations
-- **Spending Cap Awareness**: Tracks category spending limits
-- **Multi-Card Comparison**: Shows alternatives with reward comparisons
+- **15+ Cards Supported**: Chase, Amex, Capital One, Citi, Discover, and more
+
+## Simple Onboarding
+
+Users just select which cards they have - no card numbers, no login:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│              Which cards do you have?                           │
+│                                                                 │
+│   ┌─────────────────────┐  ┌─────────────────────┐            │
+│   │ Chase Sapphire      │  │ Amex Gold           │            │
+│   │ Preferred           │  │                     │            │
+│   │ 🍽️ 3x Dining        │  │ 🍽️ 4x Dining        │            │
+│   │ [ ] Add             │  │ [✓] Added           │            │
+│   └─────────────────────┘  └─────────────────────┘            │
+│                                                                 │
+│   ┌─────────────────────┐  ┌─────────────────────┐            │
+│   │ Blue Cash Preferred │  │ Citi Double Cash    │            │
+│   │ 🛒 6% Groceries     │  │ 💳 2% Everything    │            │
+│   │ [ ] Add             │  │ [ ] Add             │            │
+│   └─────────────────────┘  └─────────────────────┘            │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+The app automatically knows each card's reward structure - no data entry needed.
 
 ## Quick Start
 

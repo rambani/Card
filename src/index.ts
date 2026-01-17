@@ -24,6 +24,7 @@ import express, { Application, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import routes from './api/routes';
+import cardPickerRoutes from './api/card-picker';
 
 const app: Application = express();
 const PORT = process.env.PORT || 3000;
@@ -46,41 +47,44 @@ app.get('/health', (_req: Request, res: Response) => {
 
 // API routes
 app.use('/api', routes);
+app.use('/api/card-picker', cardPickerRoutes);
 
 // API documentation endpoint
 app.get('/api', (_req: Request, res: Response) => {
   res.json({
-    name: 'Smart Card Rewards Selection API',
+    name: 'SmartPay - Smart Card Rewards Selection API',
     version: '1.0.0',
     endpoints: {
-      cards: {
-        'GET /api/cards': 'List all cards',
-        'POST /api/cards': 'Add a new card',
-        'GET /api/cards/:id': 'Get a specific card',
-        'PATCH /api/cards/:id': 'Update card properties',
-        'DELETE /api/cards/:id': 'Remove a card',
-        'POST /api/cards/:id/primary': 'Set card as primary'
+      cardPicker: {
+        'GET /api/card-picker/products': 'List all available card products',
+        'GET /api/card-picker/products/:id': 'Get card product details',
+        'GET /api/card-picker/search?q=': 'Search cards by name',
+        'POST /api/card-picker/select': 'Add a card to your wallet',
+        'POST /api/card-picker/quick-setup': 'Add multiple cards at once',
+        'GET /api/card-picker/my-cards': 'Get your selected cards',
+        'DELETE /api/card-picker/select/:id': 'Remove a card'
+      },
+      smartpay: {
+        'POST /api/smartpay/location': 'Get card recommendation for location',
+        'POST /api/smartpay/quick-select': 'Quick category selection (Siri)',
+        'POST /api/smartpay/confirm': 'Confirm card selection',
+        'GET /api/smartpay/categories': 'Get all categories with best cards'
       },
       selection: {
         'POST /api/select-card': 'Get optimal card for transaction',
         'POST /api/compare-cards': 'Compare all cards for transaction',
         'GET /api/best-cards-by-category': 'Get best card per category'
       },
-      offers: {
-        'GET /api/cards/:id/offers': 'Get card offers',
-        'POST /api/cards/:id/offers': 'Add an offer',
-        'POST /api/cards/:cardId/offers/:offerId/activate': 'Activate offer'
-      },
       wallet: {
         'GET /api/wallet/stats': 'Get wallet statistics',
-        'POST /api/wallet/simulate': 'Simulate rewards'
+        'POST /api/wallet/simulate': 'Simulate monthly rewards'
       },
       utilities: {
         'GET /api/mcc/:code': 'Look up MCC code'
       }
     },
     headers: {
-      'x-user-id': 'Required for authenticated endpoints'
+      'x-user-id': 'User identifier (auto-generated if not provided)'
     }
   });
 });
